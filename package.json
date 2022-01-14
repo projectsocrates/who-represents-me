@@ -6,16 +6,24 @@
     "license": "MIT",
     "author": "Microsoft",
     "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon"
+        "start": "node build/index.js",
+        "build": "esbuild modules/server.tsx --platform=node --bundle --minify --outfile=build/index.js",
+        "dev": "npm run build --watch && npm run start"
     },
     "dependencies": {
         "ejs": "^3.0.1",
         "express": "^4.17.1",
-        "nodemon": "^2.0.2"
+        "nodemon": "^2.0.2",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-google-autocomplete": "^2.6.1",
+        "react-google-places-autocomplete": "^3.3.2",
+        "typescript": "^4.5.4"
     },
     "devDependencies": {
+        "esbuild": "^0.14.11",
         "gulp": "^4.0.2",
-        "gulp-imagemin": "^7.1.0"
+        "gulp-imagemin": "^7.1.0",
+        "prettier": "^2.5.1"
     }
 }
