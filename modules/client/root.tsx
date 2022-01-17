@@ -1,29 +1,17 @@
 import React, { useState } from 'react';
-import Autocomplete from 'react-google-autocomplete';
-import * as config from '../config';
 import './root.css';
+import { AddressLookup } from './AddressLookup/AddressLookup';
+import { Representatives } from './Representatives/Representatives';
 
-interface Query {
-  address: string;
-}
-export const Root: React.FC<{ query: Query }> = ({ query }) => {
+export const Root: React.FC = () => {
   const [value, setValue] = useState(null);
 
   return (
     <>
-      <Autocomplete
-        options={{ types: ['address'] }}
-        apiKey={config.GOOGLE_API_KEY}
+      <AddressLookup
         onPlaceSelected={(value) => setValue(value.formatted_address)}
       />
-      {value && <Representatives formatted_address={value} />}
+      {value && <Representatives formattedAddress={value} />}
     </>
   );
-};
-
-const Representatives: React.FC<{ formatted_address: string }> = ({
-  formatted_address,
-}) => {
-  console.log(formatted_address);
-  return <></>;
 };

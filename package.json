@@ -6,12 +6,16 @@
   "author": "Sartaj",
   "scripts": {
     "dom:build": "esbuild modules/dom/dom.tsx --bundle --outfile=built/dom.js",
+    "dom:watch": "npm run dom:build -- --watch",
     "server:build": "esbuild modules/server/server.tsx --bundle --outfile=built/server.js --platform=node",
-    "watch": "npm run dom:build -- --watch",
+    "server:watch": "npm run server:build -- --watch",
+    "server:dev": "nodemon built/server.js",
+    "dev": "concurrently \"npm:server:watch\" \"npm:dom:watch\" \"npm:server:dev\" ",
     "build": "npm run dom:build && npm run server:build",
     "start": "node built/server.js"
   },
   "dependencies": {
+    "axios": "^0.24.0",
     "express": "^4.17.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -20,7 +24,10 @@
     "typescript": "^4.5.4"
   },
   "devDependencies": {
+    "@types/node": "^17.0.8",
+    "concurrently": "^7.0.0",
     "esbuild": "^0.14.11",
+    "nodemon": "^2.0.15",
     "prettier": "^2.5.1"
   }
 }

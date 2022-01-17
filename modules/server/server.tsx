@@ -3,35 +3,17 @@ import ReactDOMServer from 'react-dom/server';
 import express from 'express';
 import * as config from '../config';
 import { Root } from '../client/root';
+import axios from 'axios';
 
 let app = express();
 const port = process.env.PORT || 3000;
 
-// const pageTemplate = `<!DOCTYPE html>
-// <html lang="en">
-//   <head>
-//     <meta charset="utf-8" />
-//     <meta
-//       name="description"
-//       content="SSR result"
-//     />
-//     <title>React App</title>
-//   </head>
-//   <body>
-//     <noscript>You need to enable JavaScript to run this app.</noscript>
-//     <div id="root"></div>
-//   </body>
-// </html>
-// `;
-// const renderPage = (reactComponent) => {
-//   const renderedComponent = ReactDOMServer.renderToString(reactComponent);
-//   return pageTemplate.replace(
-//     '<div id="root"></div>',
-//     `<div id="root">${renderedComponent}</div>`
-//   );
-// };
-
-// app.get('/*', (req, res) => res.send(renderPage(<Root query={req.query} />)));
+if (!config.GOOGLE_API_KEY) {
+  Array({ length: 3 })
+    .fill('ERROR: Must Specify GOOGLE_API_KEY')
+    .forEach((s) => console.error(s));
+  process.exit(1);
+}
 
 app.get('/', (req, res) => {
   const app = ReactDOMServer.renderToString(<Root />);
@@ -46,7 +28,7 @@ app.get('/', (req, res) => {
           <div id="root">${app}</div>
           <script>
             window.__CONFIG__ = {
-              GOOGLE_API_KEY: "${process.env.GOOGLE_API_KEY}"
+              GOOGLE_API_KEY: "${config.GOOGLE_API_KEY}"
             }
           </script>
       </body>
@@ -59,8 +41,28 @@ app.use(express.static('./built'));
 
 app.get('/representatives', async (req, res) => {
   console.log(req.query);
-  res.send(200);
-  // http.get(`https://www.googleapis.com/civicinfo/v2/representatives?key=${GOOGLE_API_KEY}`)
+  const results = await axios.get(
+    `https://www.googleapis.com/civicinfo/v2/representatives`,
+    {
+      params: {
+        key: config.GOOGLE_API_KEY,
+        address: req.query.formattedAddress,
+      },
+    }
+  );
+
+  const offices = results.data.offices
+    .map((office, i) => ({
+      office,
+      official: results.data.officials[i],
+    }))
+    .reverse();
+  const response = {
+    normalizedInput: results.data.normalizedInput,
+    divisions: results.data.divisions,
+    offices,
+  };
+  res.json(response);
 });
 
 app.listen(port);
