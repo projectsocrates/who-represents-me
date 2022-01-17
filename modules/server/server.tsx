@@ -4,6 +4,10 @@ import express from 'express';
 import * as config from '../config';
 import { Root } from '../client/root';
 import axios from 'axios';
+import {
+  GoogleRepresentativesResponse,
+  RepresentativesResult,
+} from '../entities/entities';
 
 let app = express();
 const port = process.env.PORT || 3000;
@@ -41,7 +45,7 @@ app.use(express.static('./built'));
 
 app.get('/representatives', async (req, res) => {
   console.log(req.query);
-  const results = await axios.get(
+  const results = await axios.get<GoogleRepresentativesResponse>(
     `https://www.googleapis.com/civicinfo/v2/representatives`,
     {
       params: {
@@ -52,12 +56,15 @@ app.get('/representatives', async (req, res) => {
   );
 
   const offices = results.data.offices
-    .map((office, i) => ({
-      office,
-      official: results.data.officials[i],
-    }))
+    .map((office) => {
+      return office.officialIndices.map((index) => ({
+        official: results.data.officials[index],
+        office,
+      }));
+    })
+    .flat()
     .reverse();
-  const response = {
+  const response: RepresentativesResult = {
     normalizedInput: results.data.normalizedInput,
     divisions: results.data.divisions,
     offices,
