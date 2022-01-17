@@ -5,9 +5,11 @@
   "private": true,
   "author": "Sartaj",
   "scripts": {
-    "start": "node build/index.js",
-    "build": "esbuild modules/server.tsx --platform=node --bundle --minify --outfile=build/index.js",
-    "dev": "npm run build --watch && npm run start"
+    "dom:build": "esbuild modules/dom/dom.tsx --bundle --outfile=built/dom.js",
+    "server:build": "esbuild modules/server/server.tsx --bundle --outfile=built/server.js --platform=node",
+    "watch": "npm run dom:build -- --watch",
+    "build": "npm run dom:build && npm run server:build",
+    "start": "node built/server.js"
   },
   "dependencies": {
     "express": "^4.17.1",
