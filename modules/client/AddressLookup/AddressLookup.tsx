@@ -9,10 +9,12 @@ export const AddressLookup: React.FC<{
   onPlaceSelected: ReactGoogleAutocompleteProps['onPlaceSelected'];
 }> = ({ onPlaceSelected }) => {
   return (
-    <Autocomplete
-      options={{ types: ['address'] }}
-      apiKey={config.GOOGLE_API_KEY}
-      onPlaceSelected={onPlaceSelected}
-    />
+    <div className="address-lookup-container">
+      <Autocomplete
+        options={{ types: ['address'] }}
+        apiKey={config.GOOGLE_API_KEY}
+        onPlaceSelected={onPlaceSelected}
+      />
+    </div>
   );
 };

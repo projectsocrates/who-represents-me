@@ -1,4 +1,18 @@
 input.pac-target-input {
   width: 100%;
-  font-size: 1rem;
+}
+
+.address-lookup-container {
+  padding: 10px;
+  background: #416cbb;
+}
+
+.address-lookup-container input::placeholder {
+  color: white;
+}
+
+.address-lookup-container input {
+  background: transparent;
+  color: white;
+  padding: 10px;
 }
