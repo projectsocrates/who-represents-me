@@ -1,0 +1,49 @@
+.official-card {
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background: rgb(211 211 211 / 20%);
+}
+
+.official-card .office-name {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.official-card .official-name {
+  font-size: 24px;
+}
+
+.official-card .left img {
+  max-height: 100px;
+}
+
+.flex .flex-item {
+  margin: 0 5px;
+}
+
+.flex-item.left {
+  flex: 1;
+  text-align: right;
+  padding: 10px;
+}
+.flex-item.right {
+  flex: 2;
+}
+
+.channels-container {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.channels-container li {
+  display: inline-block;
+  margin: 0 5px;
+}
+
+.channels-container li a {
+  color: black;
+}

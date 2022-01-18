@@ -9,7 +9,9 @@ export const Root: React.FC = () => {
   return (
     <>
       <AddressLookup
-        onPlaceSelected={(value) => setValue(value.formatted_address)}
+        onPlaceSelected={(value) => {
+          setValue(value.formatted_address);
+        }}
       />
       {value && <Representatives formattedAddress={value} />}
     </>

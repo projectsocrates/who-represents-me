@@ -7,9 +7,11 @@ import axios from 'axios';
 import {
   GoogleRepresentativesResponse,
   RepresentativesResult,
-} from '../entities/entities';
+  transformGoogleCivicInfo,
+} from '../entities/representatives';
 
 let app = express();
+
 const port = process.env.PORT || 3000;
 
 if (!config.GOOGLE_API_KEY) {
@@ -55,20 +57,7 @@ app.get('/representatives', async (req, res) => {
     }
   );
 
-  const offices = results.data.offices
-    .map((office) => {
-      return office.officialIndices.map((index) => ({
-        official: results.data.officials[index],
-        office,
-      }));
-    })
-    .flat()
-    .reverse();
-  const response: RepresentativesResult = {
-    normalizedInput: results.data.normalizedInput,
-    divisions: results.data.divisions,
-    offices,
-  };
+  const response = transformGoogleCivicInfo(results.data);
   res.json(response);
 });
 
