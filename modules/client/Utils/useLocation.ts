@@ -42,3 +42,20 @@ export const useLocation = () => {
 
   return { location, history, push, params };
 };
+
+export const useSearchParam = (
+  key: string,
+  defaultValue?: string
+): [string, (v: string) => void] => {
+  const { params, push } = useLocation();
+
+  const setValue = (value: string) => {
+    push({
+      searchParams: [[key, value]],
+    });
+  };
+
+  const value = params[key] || defaultValue;
+
+  return [value, setValue];
+};

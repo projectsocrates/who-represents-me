@@ -1,3 +1,4 @@
+import { dom as fontAwesomeDom } from '@fortawesome/fontawesome-svg-core';
 import result from 'await-result';
 import axios from 'axios';
 import express from 'express';
@@ -28,6 +29,7 @@ app.get('/', async (req, res) => {
   const formattedAddressParam = req.query[
     config.FORMATTED_ADDRESS_SEARCH_KEY
   ] as string;
+  const repLevel = req.query[config.REP_LEVEL_SEARCH_KEY] as string;
   if (formattedAddressParam) {
     const [err, response] = await result(
       getRepresentatives(formattedAddressParam)
@@ -39,6 +41,7 @@ app.get('/', async (req, res) => {
         <Root
           defaultFormattedAddress={formattedAddressParam}
           representatives={response}
+          defaultRepLevel={repLevel}
         />
       );
     }
@@ -52,6 +55,7 @@ app.get('/', async (req, res) => {
           <link rel="stylesheet" href="dom.css" />
           <script src="dom.js" async defer></script>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style type="text/css">${fontAwesomeDom.css()}</style>
       </head>
       <body>
           <div id="root">${app}</div>

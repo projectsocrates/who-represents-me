@@ -58,3 +58,9 @@
   justify-content: center !important;
   background: white;
 }
+
+/* Hack for server side rendering */
+.is-selected-tab {
+  color: var(--chakra-colors-blue-600);
+  border-color: currentColor;
+}

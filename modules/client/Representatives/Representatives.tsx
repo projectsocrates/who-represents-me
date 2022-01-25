@@ -14,14 +14,16 @@ import {
   faWikipediaW,
   faYoutube,
 } from '@fortawesome/free-brands-svg-icons';
-import { faGlobe, faAt, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faAt, faGlobe, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import React from 'react';
+import { REP_LEVEL_SEARCH_KEY } from '../../config';
 import {
   OfficialOffice,
   RepresentativesResult,
 } from '../../entities/representatives';
+import { useSearchParam } from '../Utils/useLocation';
 import './Representatives.css';
 
 const getRepresentatives = async ({
@@ -42,7 +44,15 @@ const getRepresentatives = async ({
 export const Representatives: React.FC<{
   formattedAddress: string;
   representatives?: RepresentativesResult;
-}> = ({ formattedAddress, representatives }) => {
+  defaultRepLevel?: string;
+}> = ({ formattedAddress, representatives, defaultRepLevel }) => {
+  const repLevels = ['city', 'county', 'state', 'national'];
+
+  const [repLevel, setRepLevel] = useSearchParam(
+    REP_LEVEL_SEARCH_KEY,
+    defaultRepLevel || repLevels[0]
+  );
+
   const [state, setState] = React.useState<RepresentativesResult>(
     representatives || null
   );
@@ -61,6 +71,7 @@ export const Representatives: React.FC<{
     getRepresentatives({ formattedAddress })
       .then((s) => {
         setState(s);
+        setRepLevel(repLevels[repLevels.indexOf(repLevel) || 0]);
       })
       .catch((e) => {
         console.error(e);
@@ -84,31 +95,27 @@ export const Representatives: React.FC<{
     <Tabs
       ref={ref}
       flex="1"
-      children={
-        <>
-          <TabList>
-            <Tab>City</Tab>
-            <Tab>County</Tab>
-            <Tab>State</Tab>
-            <Tab>National</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <OfficialOfficeList officialOffice={state.offices['city']} />
-            </TabPanel>
-            <TabPanel>
-              <OfficialOfficeList officialOffice={state.offices['county']} />
-            </TabPanel>
-            <TabPanel>
-              <OfficialOfficeList officialOffice={state.offices['state']} />
-            </TabPanel>
-            <TabPanel>
-              <OfficialOfficeList officialOffice={state.offices['national']} />
-            </TabPanel>
-          </TabPanels>
-        </>
-      }
-    />
+      onChange={(i) => {
+        setRepLevel(repLevels[i]);
+      }}
+      index={repLevels.indexOf(repLevel)}
+    >
+      <TabList>
+        {repLevels.map((level) => (
+          // className is for server side rendering to have styles same as aria-selected
+          <Tab key={level} className={repLevel === level && 'is-selected-tab'}>
+            {level}
+          </Tab>
+        ))}
+      </TabList>
+      <TabPanels>
+        {repLevels.map((level) => (
+          <TabPanel key={level}>
+            <OfficialOfficeList officialOffice={state.offices[level]} />
+          </TabPanel>
+        ))}
+      </TabPanels>
+    </Tabs>
   );
 };
 

@@ -1,37 +1,23 @@
-import React, { useState } from 'react';
-import './Root.css';
-import { AddressLookup } from '../AddressLookup/AddressLookup';
-import { Representatives } from '../Representatives/Representatives';
 import { ChakraProvider, Container } from '@chakra-ui/react';
-import { Instructions } from '../Instructions/Instructions';
-import { useLocation } from '../Utils/useLocation';
+import React from 'react';
 import { FORMATTED_ADDRESS_SEARCH_KEY } from '../../config';
 import { RepresentativesResult } from '../../entities/representatives';
-
-const useFormattedAddress = (
-  defaultFormattedAddress?: string
-): [string, (formatted_address: string) => void] => {
-  const { params, push } = useLocation();
-
-  const setFormattedAddress = (formatted_address: string) => {
-    push({
-      searchParams: [[FORMATTED_ADDRESS_SEARCH_KEY, formatted_address]],
-    });
-  };
-
-  const formattedAddress =
-    params[FORMATTED_ADDRESS_SEARCH_KEY] || defaultFormattedAddress;
-
-  return [formattedAddress, setFormattedAddress];
-};
+import { AddressLookup } from '../AddressLookup/AddressLookup';
+import { Instructions } from '../Instructions/Instructions';
+import { Representatives } from '../Representatives/Representatives';
+import { useSearchParam } from '../Utils/useLocation';
+import './Root.css';
 
 export const Root: React.FC<{
   representatives?: RepresentativesResult;
   defaultFormattedAddress?: string;
-}> = ({ representatives, defaultFormattedAddress }) => {
-  const [formattedAddress, setFormattedAddress] = useFormattedAddress(
+  defaultRepLevel?: string;
+}> = ({ representatives, defaultFormattedAddress, defaultRepLevel }) => {
+  const [formattedAddress, setFormattedAddress] = useSearchParam(
+    FORMATTED_ADDRESS_SEARCH_KEY,
     defaultFormattedAddress
   );
+
   return (
     <AppContext>
       <AddressLookup
@@ -45,6 +31,7 @@ export const Root: React.FC<{
           <Representatives
             representatives={representatives}
             formattedAddress={formattedAddress}
+            defaultRepLevel={defaultRepLevel}
           />
         ) : (
           <Instructions />

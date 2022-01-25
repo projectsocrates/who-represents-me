@@ -5,4 +5,6 @@ const config =
 
 export const GOOGLE_API_KEY = config.GOOGLE_API_KEY;
 
-export const FORMATTED_ADDRESS_SEARCH_KEY = 'q';
+export const FORMATTED_ADDRESS_SEARCH_KEY = 'address';
+
+export const REP_LEVEL_SEARCH_KEY = 'level';
