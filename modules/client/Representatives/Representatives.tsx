@@ -1,4 +1,5 @@
 import {
+  Box,
   Heading,
   Tab,
   TabList,
@@ -28,17 +29,24 @@ const getRepresentatives = async ({
 }: {
   formattedAddress: string;
 }): Promise<RepresentativesResult> => {
-  const response = await axios.get('/representatives', {
-    params: { formattedAddress },
-  });
-  return response.data as RepresentativesResult;
+  try {
+    const response = await axios.get('/representatives', {
+      params: { formattedAddress },
+    });
+    return response.data as RepresentativesResult;
+  } catch (e) {
+    throw new Error(e.response.data);
+  }
 };
 
-export const Representatives: React.FC<{ formattedAddress: string }> = ({
-  formattedAddress,
-}) => {
-  const [state2, setState] = React.useState<RepresentativesResult>(null);
-  const state = state2 as RepresentativesResult | null;
+export const Representatives: React.FC<{
+  formattedAddress: string;
+  representatives?: RepresentativesResult;
+}> = ({ formattedAddress, representatives }) => {
+  const [state, setState] = React.useState<RepresentativesResult>(
+    representatives || null
+  );
+  const [error, setError] = React.useState<Error | null>(null);
 
   const ref = React.useCallback((node: null | HTMLDivElement) => {
     if (node !== null && node.querySelector('[role=tablist]') !== null) {
@@ -50,11 +58,24 @@ export const Representatives: React.FC<{ formattedAddress: string }> = ({
   }, []);
 
   React.useEffect(() => {
-    getRepresentatives({ formattedAddress }).then((s) => {
-      setState(s);
-    });
+    getRepresentatives({ formattedAddress })
+      .then((s) => {
+        setState(s);
+      })
+      .catch((e) => {
+        console.error(e);
+        setError(e);
+      });
   }, [formattedAddress]);
 
+  if (error) {
+    return (
+      <Box>
+        <Heading>Something Went Wrong</Heading>
+        <Text>{error.message}</Text>
+      </Box>
+    );
+  }
   if (state === null) {
     return null;
   }

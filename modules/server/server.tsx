@@ -1,12 +1,12 @@
+import result from 'await-result';
+import axios from 'axios';
+import express from 'express';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import express from 'express';
-import * as config from '../config';
 import { Root } from '../client/Root/Root';
-import axios from 'axios';
+import * as config from '../config';
 import {
   GoogleRepresentativesResponse,
-  RepresentativesResult,
   transformGoogleCivicInfo,
 } from '../entities/representatives';
 
@@ -23,8 +23,28 @@ if (!config.GOOGLE_API_KEY) {
   process.exit(1);
 }
 
-app.get('/', (req, res) => {
-  const app = ReactDOMServer.renderToString(<Root />);
+app.get('/', async (req, res) => {
+  let app: string;
+  const formattedAddressParam = req.query[
+    config.FORMATTED_ADDRESS_SEARCH_KEY
+  ] as string;
+  if (formattedAddressParam) {
+    const [err, response] = await result(
+      getRepresentatives(formattedAddressParam)
+    );
+    if (err) {
+      app = ReactDOMServer.renderToString(<Root />);
+    } else {
+      app = ReactDOMServer.renderToString(
+        <Root
+          defaultFormattedAddress={formattedAddressParam}
+          representatives={response}
+        />
+      );
+    }
+  } else {
+    app = ReactDOMServer.renderToString(<Root />);
+  }
 
   const html = `
       <html lang="en">
@@ -49,19 +69,33 @@ app.get('/', (req, res) => {
 app.use(express.static('./built'));
 
 app.get('/representatives', async (req, res) => {
-  console.log(req.query);
-  const results = await axios.get<GoogleRepresentativesResponse>(
-    `https://www.googleapis.com/civicinfo/v2/representatives`,
-    {
-      params: {
-        key: config.GOOGLE_API_KEY,
-        address: req.query.formattedAddress,
-      },
-    }
+  const [err, response] = await result(
+    getRepresentatives(req.query.formattedAddress as string)
   );
-
-  const response = transformGoogleCivicInfo(results.data);
+  if (err) {
+    res.status(500).send(err);
+  }
   res.json(response);
 });
+
+const getRepresentatives = async (address: string) => {
+  console.log('searching for representatives for', address);
+  try {
+    const results = await axios.get<GoogleRepresentativesResponse>(
+      `https://www.googleapis.com/civicinfo/v2/representatives`,
+      {
+        params: {
+          key: config.GOOGLE_API_KEY,
+          address: address,
+        },
+      }
+    );
+
+    const response = transformGoogleCivicInfo(results.data);
+    return response;
+  } catch (e) {
+    throw e;
+  }
+};
 
 app.listen(port);

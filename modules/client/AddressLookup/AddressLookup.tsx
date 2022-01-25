@@ -8,7 +8,8 @@ import './AddressLookup.css';
 
 export const AddressLookup: React.FC<{
   onPlaceSelected: ReactGoogleAutocompleteProps['onPlaceSelected'];
-}> = ({ onPlaceSelected }) => {
+  defaultValue?: string;
+}> = ({ onPlaceSelected, defaultValue }) => {
   return (
     <Container
       textAlign="center"
@@ -23,6 +24,7 @@ export const AddressLookup: React.FC<{
         apiKey={config.GOOGLE_API_KEY}
         onPlaceSelected={onPlaceSelected}
         placeholder="Type In Your Address Here..."
+        defaultValue={defaultValue}
       />
     </Container>
   );

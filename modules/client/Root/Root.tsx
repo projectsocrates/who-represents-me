@@ -1,23 +1,51 @@
 import React, { useState } from 'react';
-import './root.css';
+import './Root.css';
 import { AddressLookup } from '../AddressLookup/AddressLookup';
 import { Representatives } from '../Representatives/Representatives';
 import { ChakraProvider, Container } from '@chakra-ui/react';
 import { Instructions } from '../Instructions/Instructions';
+import { useLocation } from '../Utils/useLocation';
+import { FORMATTED_ADDRESS_SEARCH_KEY } from '../../config';
+import { RepresentativesResult } from '../../entities/representatives';
 
-export const Root: React.FC = () => {
-  const [value, setValue] = useState(null);
+const useFormattedAddress = (
+  defaultFormattedAddress?: string
+): [string, (formatted_address: string) => void] => {
+  const { params, push } = useLocation();
 
+  const setFormattedAddress = (formatted_address: string) => {
+    push({
+      searchParams: [[FORMATTED_ADDRESS_SEARCH_KEY, formatted_address]],
+    });
+  };
+
+  const formattedAddress =
+    params[FORMATTED_ADDRESS_SEARCH_KEY] || defaultFormattedAddress;
+
+  return [formattedAddress, setFormattedAddress];
+};
+
+export const Root: React.FC<{
+  representatives?: RepresentativesResult;
+  defaultFormattedAddress?: string;
+}> = ({ representatives, defaultFormattedAddress }) => {
+  const [formattedAddress, setFormattedAddress] = useFormattedAddress(
+    defaultFormattedAddress
+  );
   return (
     <AppContext>
       <AddressLookup
+        defaultValue={formattedAddress}
         onPlaceSelected={(value) => {
-          setValue(value.formatted_address);
+          setFormattedAddress(value.formatted_address);
         }}
       />
       <Container display="flex" flex="auto" padding="0" width="100%">
-        {value ? (
-          <Representatives formattedAddress={value} />
+        {formattedAddress || representatives ? (
+          <Representatives
+            representatives={representatives}
+            formattedAddress={formattedAddress}
+          />
         ) : (
           <Instructions />
         )}
