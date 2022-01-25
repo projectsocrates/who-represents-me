@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './root.css';
-import { AddressLookup } from './AddressLookup/AddressLookup';
-import { Representatives } from './Representatives/Representatives';
+import { AddressLookup } from '../AddressLookup/AddressLookup';
+import { Representatives } from '../Representatives/Representatives';
 import { ChakraProvider, Container } from '@chakra-ui/react';
-import { Instructions } from './Instructions/Instructions';
+import { Instructions } from '../Instructions/Instructions';
 
 export const Root: React.FC = () => {
   const [value, setValue] = useState(null);

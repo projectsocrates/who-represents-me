@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Root } from '../client/root';
+import { Root } from '../client/Root/Root';
 
 ReactDOM.hydrate(
   <React.StrictMode>

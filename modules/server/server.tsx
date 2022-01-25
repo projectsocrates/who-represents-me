@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import express from 'express';
 import * as config from '../config';
-import { Root } from '../client/root';
+import { Root } from '../client/Root/Root';
 import axios from 'axios';
 import {
   GoogleRepresentativesResponse,
