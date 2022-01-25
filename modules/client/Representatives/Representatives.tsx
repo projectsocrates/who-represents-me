@@ -34,23 +34,35 @@ const getRepresentatives = async ({
   return response.data as RepresentativesResult;
 };
 
-export const Representatives: React.FC<{ formatted_address: string }> = ({
+export const Representatives: React.FC<{ formattedAddress: string }> = ({
   formattedAddress,
 }) => {
   const [state2, setState] = React.useState<RepresentativesResult>(null);
   const state = state2 as RepresentativesResult | null;
+
+  const ref = React.useCallback((node: null | HTMLDivElement) => {
+    if (node !== null && node.querySelector('[role=tablist]') !== null) {
+      const tablist = node.querySelector('[role=tablist]') as HTMLDivElement;
+      const toTop = window.pageYOffset + tablist.getBoundingClientRect().top;
+      tablist.style.top = toTop.toString();
+      tablist.style.position = 'sticky';
+    }
+  }, []);
+
   React.useEffect(() => {
     getRepresentatives({ formattedAddress }).then((s) => {
       setState(s);
     });
   }, [formattedAddress]);
-  console.log(state);
+
   if (state === null) {
     return null;
   }
 
   return (
     <Tabs
+      ref={ref}
+      flex="1"
       children={
         <>
           <TabList>

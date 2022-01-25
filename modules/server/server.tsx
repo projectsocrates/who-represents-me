@@ -16,7 +16,9 @@ const port = process.env.PORT || 3000;
 
 if (!config.GOOGLE_API_KEY) {
   Array({ length: 3 })
-    .fill('ERROR: Must Specify GOOGLE_API_KEY')
+    .fill(
+      'ERROR: Must Specify GOOGLE_API_KEY. In GitHub, set secret in CodeSpaces. In Heroku, set secret in Heroku settings.'
+    )
     .forEach((s) => console.error(s));
   process.exit(1);
 }
