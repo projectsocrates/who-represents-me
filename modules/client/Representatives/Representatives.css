@@ -56,4 +56,5 @@
 
 .chakra-tabs__tablist {
   justify-content: center !important;
+  background: white;
 }

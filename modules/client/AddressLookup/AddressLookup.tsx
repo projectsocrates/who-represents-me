@@ -1,3 +1,4 @@
+import { Container } from '@chakra-ui/react';
 import React from 'react';
 import Autocomplete, {
   ReactGoogleAutocompleteProps,
@@ -9,12 +10,20 @@ export const AddressLookup: React.FC<{
   onPlaceSelected: ReactGoogleAutocompleteProps['onPlaceSelected'];
 }> = ({ onPlaceSelected }) => {
   return (
-    <div className="address-lookup-container">
+    <Container
+      textAlign="center"
+      display="flex"
+      width="100%"
+      background="#416cbb"
+      padding="0"
+      className="address-lookup-container"
+    >
       <Autocomplete
         options={{ types: ['address'] }}
         apiKey={config.GOOGLE_API_KEY}
         onPlaceSelected={onPlaceSelected}
+        placeholder="Type In Your Address Here..."
       />
-    </div>
+    </Container>
   );
 };

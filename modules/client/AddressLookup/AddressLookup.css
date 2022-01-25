@@ -1,10 +1,6 @@
-input.pac-target-input {
-  width: 100%;
-}
-
 .address-lookup-container {
-  padding: 10px;
-  background: #416cbb;
+  position: sticky;
+  top: 0;
 }
 
 .address-lookup-container input::placeholder {
@@ -14,5 +10,6 @@ input.pac-target-input {
 .address-lookup-container input {
   background: transparent;
   color: white;
+  width: 100%;
   padding: 10px;
 }
