@@ -1,6 +1,9 @@
 import {
   Box,
+  Container,
+  Flex,
   Heading,
+  SimpleGrid,
   Tab,
   TabList,
   TabPanel,
@@ -8,14 +11,7 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
-import {
-  faFacebook,
-  faTwitter,
-  faWikipediaW,
-  faYoutube,
-} from '@fortawesome/free-brands-svg-icons';
-import { faAt, faGlobe, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import axios from 'axios';
 import React from 'react';
 import { REP_LEVEL_SEARCH_KEY } from '../../config';
@@ -23,6 +19,8 @@ import {
   OfficialOffice,
   RepresentativesResult,
 } from '../../entities/representatives';
+import { Bills, getLocale, BillsType } from '../Bills/Bills';
+import { Channel, ResultCard } from '../Components/Components';
 import { useSearchParam } from '../Utils/useLocation';
 import './Representatives.css';
 
@@ -44,8 +42,9 @@ const getRepresentatives = async ({
 export const Representatives: React.FC<{
   formattedAddress: string;
   representatives?: RepresentativesResult;
+  bills?: BillsType[];
   defaultRepLevel?: string;
-}> = ({ formattedAddress, representatives, defaultRepLevel }) => {
+}> = ({ formattedAddress, representatives, defaultRepLevel, bills }) => {
   const repLevels = ['city', 'county', 'state', 'national'];
 
   const [repLevel, setRepLevel] = useSearchParam(
@@ -90,7 +89,7 @@ export const Representatives: React.FC<{
   if (state === null) {
     return null;
   }
-
+  const locale = getLocale(formattedAddress);
   return (
     <Tabs
       ref={ref}
@@ -111,7 +110,30 @@ export const Representatives: React.FC<{
       <TabPanels>
         {repLevels.map((level) => (
           <TabPanel key={level}>
-            <OfficialOfficeList officialOffice={state.offices[level]} />
+            {level === 'city' && locale ? (
+              <Container maxW="container.lg">
+                <SimpleGrid columns={2} spacing={5} minChildWidth="200px">
+                  <Container display="flex" flexDir={'column'}>
+                    {level === 'city' && locale ? (
+                      <Bills locale={locale} bills={bills} />
+                    ) : null}
+                  </Container>
+                  <Container display="flex" flexDir={'column'}>
+                    <Heading as="h1" size="lg">
+                      Your Representatives
+                    </Heading>
+                    <OfficialOfficeList officialOffice={state.offices[level]} />
+                  </Container>
+                </SimpleGrid>
+              </Container>
+            ) : (
+              <Container>
+                <Heading as="h1" size="lg">
+                  Your Representatives
+                </Heading>
+                <OfficialOfficeList officialOffice={state.offices[level]} />
+              </Container>
+            )}
           </TabPanel>
         ))}
       </TabPanels>
@@ -125,19 +147,12 @@ export const OfficialOfficeList: React.FC<{
   return (
     <>
       {officialOffice.map((s: OfficialOffice) => (
-        <div
-          className="flex official-card"
+        <ResultCard
           key={s.office.name + s.official.name}
-        >
-          {/* <div className="flex-item left">
-            <img src={s.official.photoUrl} />
-          </div> */}
-          <div className="flex-item right">
-            <Heading as="h4" size="md">
-              {s.office.name}
-            </Heading>
-            <Text fontSize="lg">{s.official.name}</Text>
-            <ul className="channels-container">
+          title={s.office.name}
+          subtitle={s.official.name}
+          channels={
+            <>
               {s.official.channels?.map((channel) => {
                 return (
                   <li key={channel.type + channel.id}>
@@ -160,64 +175,10 @@ export const OfficialOfficeList: React.FC<{
                   <Channel type="URL" id={id} />
                 </li>
               ))}
-            </ul>
-          </div>
-        </div>
+            </>
+          }
+        />
       ))}
     </>
   );
-};
-
-export const Channel: React.FC<{ id: string; type: string }> = (channel) => {
-  switch (channel.type) {
-    case 'Facebook':
-      return (
-        <a target="_blank" href={`https://facebook.com/${channel.id}`}>
-          <FontAwesomeIcon icon={faFacebook} />
-        </a>
-      );
-    case 'Twitter':
-      return (
-        <a target="_blank" href={`https://twitter.com/${channel.id}`}>
-          <FontAwesomeIcon icon={faTwitter} />
-        </a>
-      );
-    case 'Email':
-      return (
-        <a target="_blank" href={`mailto:${channel.id}`}>
-          <FontAwesomeIcon icon={faAt} />
-        </a>
-      );
-    case 'Phone':
-      return (
-        <a target="_blank" href={`tel:${channel.id}`}>
-          <FontAwesomeIcon icon={faPhone} />
-        </a>
-      );
-    case 'URL':
-      if (channel.id.includes('wikipedia')) {
-        return (
-          <a target="_blank" href={channel.id}>
-            <FontAwesomeIcon icon={faWikipediaW} />
-          </a>
-        );
-      }
-      return (
-        <a target="_blank" href={channel.id}>
-          <FontAwesomeIcon icon={faGlobe} />
-        </a>
-      );
-    case 'YouTube':
-      return (
-        <a target="_blank" href={`https://youtube.com/${channel.id}`}>
-          <FontAwesomeIcon icon={faYoutube} />
-        </a>
-      );
-    default:
-      return (
-        <>
-          {channel.type}: {channel.id}
-        </>
-      );
-  }
 };

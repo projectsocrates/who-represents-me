@@ -1,6 +1,7 @@
-import { ChakraProvider, Container } from '@chakra-ui/react';
+import { ChakraProvider, Container, Flex } from '@chakra-ui/react';
 import React from 'react';
 import { FORMATTED_ADDRESS_SEARCH_KEY } from '../../config';
+import { Bills } from '../../entities/bills';
 import { RepresentativesResult } from '../../entities/representatives';
 import { AddressLookup } from '../AddressLookup/AddressLookup';
 import { Instructions } from '../Instructions/Instructions';
@@ -10,9 +11,10 @@ import './Root.css';
 
 export const Root: React.FC<{
   representatives?: RepresentativesResult;
+  bills?: Bills[];
   defaultFormattedAddress?: string;
   defaultRepLevel?: string;
-}> = ({ representatives, defaultFormattedAddress, defaultRepLevel }) => {
+}> = ({ representatives, defaultFormattedAddress, defaultRepLevel, bills }) => {
   const [formattedAddress, setFormattedAddress] = useSearchParam(
     FORMATTED_ADDRESS_SEARCH_KEY,
     defaultFormattedAddress
@@ -26,17 +28,20 @@ export const Root: React.FC<{
           setFormattedAddress(value.formatted_address);
         }}
       />
-      <Container display="flex" flex="auto" padding="0" width="100%">
+      <Flex flex="auto" padding="0" width="100%">
         {formattedAddress || representatives ? (
-          <Representatives
-            representatives={representatives}
-            formattedAddress={formattedAddress}
-            defaultRepLevel={defaultRepLevel}
-          />
+          <>
+            <Representatives
+              representatives={representatives}
+              bills={bills}
+              formattedAddress={formattedAddress}
+              defaultRepLevel={defaultRepLevel}
+            />
+          </>
         ) : (
           <Instructions />
         )}
-      </Container>
+      </Flex>
     </AppContext>
   );
 };
@@ -44,8 +49,7 @@ export const Root: React.FC<{
 export const AppContext: React.FC = ({ children }) => {
   return (
     <ChakraProvider>
-      <Container
-        display="flex"
+      <Flex
         alignItems="center"
         justifyContent="center"
         minH="100vh"
@@ -53,7 +57,7 @@ export const AppContext: React.FC = ({ children }) => {
         padding="0"
       >
         {children}
-      </Container>
+      </Flex>
     </ChakraProvider>
   );
 };

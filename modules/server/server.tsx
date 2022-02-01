@@ -4,12 +4,15 @@ import axios from 'axios';
 import express from 'express';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
+import { getLocale } from '../client/Bills/Bills';
 import { Root } from '../client/Root/Root';
 import * as config from '../config';
+import { Bills, Locales } from '../entities/bills';
 import {
   GoogleRepresentativesResponse,
   transformGoogleCivicInfo,
 } from '../entities/representatives';
+import { getChicagoBills } from './chicago-bills';
 
 let app = express();
 
@@ -31,16 +34,30 @@ app.get('/', async (req, res) => {
   ] as string;
   const repLevel = req.query[config.REP_LEVEL_SEARCH_KEY] as string;
   if (formattedAddressParam) {
-    const [err, response] = await result(
+    // reps
+    const [err, representatives] = await result(
       getRepresentatives(formattedAddressParam)
     );
-    if (err) {
+
+    // bills
+    const locale = getLocale(formattedAddressParam);
+    let bills: Bills[] = [];
+    let billErr;
+    if (locale && repLevel === 'city') {
+      const res = await result(getBills(locale));
+      bills = res[1];
+      billErr = res[0];
+    }
+
+    // errors
+    if (err || billErr) {
       app = ReactDOMServer.renderToString(<Root />);
     } else {
       app = ReactDOMServer.renderToString(
         <Root
           defaultFormattedAddress={formattedAddressParam}
-          representatives={response}
+          representatives={representatives}
+          bills={bills}
           defaultRepLevel={repLevel}
         />
       );
@@ -81,6 +98,27 @@ app.get('/representatives', async (req, res) => {
   }
   res.json(response);
 });
+
+app.get('/bills', async (req, res) => {
+  const [err, response] = await result(getBills(req.query.locale as Locales));
+  if (err) {
+    res.status(500).send(err);
+  }
+  res.json(response);
+});
+
+const getBills = async (locale: Locales): Promise<Bills[]> => {
+  let cityData: Bills[] = [];
+  switch (locale) {
+    case 'Chicago':
+      cityData = await getChicagoBills();
+      break;
+    default:
+      cityData = [];
+      break;
+  }
+  return cityData;
+};
 
 const getRepresentatives = async (address: string) => {
   console.log('searching for representatives for', address);
