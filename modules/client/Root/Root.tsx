@@ -1,4 +1,4 @@
-import { ChakraProvider, Container, Flex } from '@chakra-ui/react';
+import { ChakraProvider, Flex } from '@chakra-ui/react';
 import React from 'react';
 import { FORMATTED_ADDRESS_SEARCH_KEY } from '../../config';
 import { Bills } from '../../entities/bills';

@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Container,
-  Flex,
   Heading,
   SimpleGrid,
   Tab,
@@ -12,7 +11,6 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
-
 import axios from 'axios';
 import React from 'react';
 import { REP_LEVEL_SEARCH_KEY } from '../../config';
@@ -20,7 +18,7 @@ import {
   OfficialOffice,
   RepresentativesResult,
 } from '../../entities/representatives';
-import { Bills, getLocale, BillsType } from '../Bills/Bills';
+import { Bills, BillsType, getLocale } from '../Bills/Bills';
 import { Channel, ResultCard } from '../Components/Components';
 import { useSearchParam } from '../Utils/useLocation';
 import { useQuery } from '../Utils/useQuery';
@@ -120,21 +118,21 @@ export const Representatives: React.FC<{
         {repLevels.map((level) => (
           <TabPanel key={level}>
             {level === 'city' && locale ? (
-              <Container maxW="container.lg">
+              <Container maxW="container.lg" padding="0">
                 <SimpleGrid columns={2} spacing={5} minChildWidth="200px">
-                  <Container display="flex" flexDir={'column'}>
+                  <Container display="flex" flexDir={'column'} padding="0">
                     {level === 'city' && locale ? (
                       <Bills locale={locale} bills={bills} />
                     ) : null}
                   </Container>
-                  <Container display="flex" flexDir={'column'}>
+                  <Container display="flex" flexDir={'column'} padding="0">
                     {heading}
                     <OfficialOfficeList officialOffice={state.offices[level]} />
                   </Container>
                 </SimpleGrid>
               </Container>
             ) : (
-              <Container>
+              <Container padding="0">
                 {heading}
                 <OfficialOfficeList officialOffice={state.offices[level]} />
               </Container>
