@@ -1,4 +1,4 @@
-import { Container } from '@chakra-ui/react';
+import { Container, Flex } from '@chakra-ui/react';
 import React from 'react';
 import Autocomplete, {
   ReactGoogleAutocompleteProps,
@@ -11,9 +11,8 @@ export const AddressLookup: React.FC<{
   defaultValue?: string;
 }> = ({ onPlaceSelected, defaultValue }) => {
   return (
-    <Container
+    <Flex
       textAlign="center"
-      display="flex"
       width="100%"
       background="#416cbb"
       padding="0"
@@ -26,6 +25,6 @@ export const AddressLookup: React.FC<{
         placeholder="Type In Your Address Here..."
         defaultValue={defaultValue}
       />
-    </Container>
+    </Flex>
   );
 };
