@@ -1,8 +1,9 @@
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Box, Button, Heading, Text } from '@chakra-ui/react';
 import axios from 'axios';
 import React from 'react';
 import { Bills as _Bills, Locales } from '../../entities/bills';
 import { Channel, ResultCard } from '../Components/Components';
+import { useQuery } from '../Utils/useQuery';
 
 export type BillsType = _Bills;
 
@@ -25,20 +26,24 @@ export const Bills: React.FC<{
   locale: Locales;
   bills: BillsType[];
 }> = ({ locale, bills }) => {
-  const [state, setState] = React.useState<BillsType[]>(bills || null);
-  const [error, setError] = React.useState<Error | null>(null);
+  const { data, error, loading } = useQuery<BillsType[]>(
+    () => getBills({ locale }),
+    {
+      defaultData: bills,
+    }
+  );
 
-  React.useEffect(() => {
-    getBills({ locale })
-      .then((s) => {
-        setState(s);
-      })
-      .catch((e) => {
-        console.error(e);
-        setError(e);
-      });
-  }, [locale]);
-
+  if (loading) {
+    return (
+      <>
+        <Heading as="h1" size="lg">
+          Active Resolutions
+        </Heading>
+        <br />
+        <Button isLoading loadingText="Loading" variant="outline" />
+      </>
+    );
+  }
   if (error) {
     return (
       <Box>
@@ -47,7 +52,7 @@ export const Bills: React.FC<{
       </Box>
     );
   }
-  if (state === null) {
+  if (data === null) {
     return null;
   }
 
@@ -56,7 +61,7 @@ export const Bills: React.FC<{
       <Heading as="h1" size="lg">
         Active Resolutions
       </Heading>
-      {state.map((bill) => (
+      {data.map((bill) => (
         <ResultCard
           key={bill.id}
           title={bill.title}

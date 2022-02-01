@@ -19,7 +19,6 @@ export const Root: React.FC<{
     FORMATTED_ADDRESS_SEARCH_KEY,
     defaultFormattedAddress
   );
-
   return (
     <AppContext>
       <AddressLookup

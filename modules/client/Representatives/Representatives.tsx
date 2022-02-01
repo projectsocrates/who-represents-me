@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   Flex,
   Heading,
@@ -22,6 +23,7 @@ import {
 import { Bills, getLocale, BillsType } from '../Bills/Bills';
 import { Channel, ResultCard } from '../Components/Components';
 import { useSearchParam } from '../Utils/useLocation';
+import { useQuery } from '../Utils/useQuery';
 import './Representatives.css';
 
 const getRepresentatives = async ({
@@ -52,10 +54,16 @@ export const Representatives: React.FC<{
     defaultRepLevel || repLevels[0]
   );
 
-  const [state, setState] = React.useState<RepresentativesResult>(
-    representatives || null
+  const {
+    data: state,
+    loading,
+    error,
+  } = useQuery<RepresentativesResult>(
+    () => getRepresentatives({ formattedAddress }),
+    {
+      defaultData: representatives,
+    }
   );
-  const [error, setError] = React.useState<Error | null>(null);
 
   const ref = React.useCallback((node: null | HTMLDivElement) => {
     if (node !== null && node.querySelector('[role=tablist]') !== null) {
@@ -66,18 +74,19 @@ export const Representatives: React.FC<{
     }
   }, []);
 
-  React.useEffect(() => {
-    getRepresentatives({ formattedAddress })
-      .then((s) => {
-        setState(s);
-        setRepLevel(repLevels[repLevels.indexOf(repLevel) || 0]);
-      })
-      .catch((e) => {
-        console.error(e);
-        setError(e);
-      });
-  }, [formattedAddress]);
+  const heading = (
+    <Heading as="h1" size="lg">
+      Your Representatives
+    </Heading>
+  );
 
+  if (loading) {
+    return (
+      <Container display="flex" padding={2} justifyContent={'center'}>
+        <Button isLoading loadingText="Loading" variant="outline" />
+      </Container>
+    );
+  }
   if (error) {
     return (
       <Box>
@@ -119,18 +128,14 @@ export const Representatives: React.FC<{
                     ) : null}
                   </Container>
                   <Container display="flex" flexDir={'column'}>
-                    <Heading as="h1" size="lg">
-                      Your Representatives
-                    </Heading>
+                    {heading}
                     <OfficialOfficeList officialOffice={state.offices[level]} />
                   </Container>
                 </SimpleGrid>
               </Container>
             ) : (
               <Container>
-                <Heading as="h1" size="lg">
-                  Your Representatives
-                </Heading>
+                {heading}
                 <OfficialOfficeList officialOffice={state.offices[level]} />
               </Container>
             )}

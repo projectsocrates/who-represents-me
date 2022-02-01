@@ -108,6 +108,7 @@ app.get('/bills', async (req, res) => {
 });
 
 const getBills = async (locale: Locales): Promise<Bills[]> => {
+  console.log('gettings bills for', locale);
   let cityData: Bills[] = [];
   switch (locale) {
     case 'Chicago':
